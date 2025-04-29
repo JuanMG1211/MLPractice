@@ -179,11 +179,16 @@ subset[["gyro_y", "gyro_y_temp_mean_ws_5", "gyro_y_temp_std_ws_5"]].plot()
 # --------------------------------------------------------------
 # Frequency features
 # --------------------------------------------------------------
+
+# The Fourier Transformation detects acceleration and rotation
+# patterns that repeat on every rep, which have characteristic
+# frequencies and amplitudes, that'll further assist
+# the model training process.
 df_freq = df_temporal.copy().reset_index()
 FreqAbs = FourierTransformation()
 
 sampling_rate = int(1000 / 200)  # 5 measurements per second
-window_size = int(2900 / 200)  # Average repetition duration
+window_size = int(2800 / 200)  # Average repetition duration
 
 df_freq = FreqAbs.abstract_frequency(df_freq, ["acc_y"], window_size, sampling_rate)
 
@@ -215,6 +220,10 @@ df_freq = pd.concat(df_freq_list).set_index("epoch (ms)", drop=True)
 # Dealing with overlapping windows
 # --------------------------------------------------------------
 
+# Too much correlation between variables can affect model accuracy by making it
+# difficult to determine how a single one affects the model as a whole,
+# as well as making the model extremely sensitive to minor changes
+
 df_freq = df_freq.dropna()
 
 df_freq = df_freq.iloc[::2]
@@ -222,6 +231,12 @@ df_freq = df_freq.iloc[::2]
 # --------------------------------------------------------------
 # Clustering
 # --------------------------------------------------------------
+
+# K-Means Clustering: Unsupervised ML algorithm that groups data into
+# a k number ofclusters based on similarity. (Identifies the most
+# important features in a dataset). The Elbow Methos is also used here
+# to determine the most optimal number of clusters.
+
 df_cluster = df_freq.copy()
 
 cluster_columns = ["acc_x", "acc_y", "acc_z"]
@@ -234,6 +249,7 @@ for k in k_values:
     cluster_labels = kmeans.fit_predict(subset)
     inertias.append(kmeans.inertia_)
 
+# The optimal K value seems to be 5 in this case
 plt.figure(figsize=(10, 10))
 plt.plot(k_values, inertias)
 plt.xlabel("k")
@@ -244,6 +260,7 @@ kmeans = KMeans(n_clusters=5, n_init=20, random_state=0)
 subset = df_cluster[cluster_columns]
 df_cluster["cluster"] = kmeans.fit_predict(subset)
 
+# Plotting clusters by cluster number
 fig = plt.figure(figsize=(15, 15))
 ax = fig.add_subplot(projection="3d")
 for c in df_cluster["cluster"].unique():
@@ -255,6 +272,7 @@ ax.set_zlabel("Z-axis")
 plt.legend()
 plt.show()
 
+# Plotting clusters by excercise type
 fig = plt.figure(figsize=(15, 15))
 ax = fig.add_subplot(projection="3d")
 for label in df_cluster["label"].unique():
@@ -270,4 +288,4 @@ plt.show()
 # Export dataset
 # --------------------------------------------------------------
 
-df_cluster.to_pickle("../../data/interim/02_data_features.pkl")
+df_cluster.to_pickle("../../data/interim/03_data_features.pkl")
