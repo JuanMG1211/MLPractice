@@ -340,24 +340,12 @@ cm = confusion_matrix(Y_test, class_test_y, labels=classes)
 # create confusion matrix for cm
 plt.figure(figsize=(10, 10))
 plt.imshow(cm, interpolation="nearest", cmap=plt.cm.Blues)
-plt.title("Confusion matrix: Neural Network + Feature Set 4")
+plt.suptitle(f"Accuracy: {accuracy:.5f}", fontsize=12, fontweight="bold", y=0.94)
+plt.title("Confusion matrix: Neural Network + Feature Set 4", pad=20)
 plt.colorbar()
 tick_marks = np.arange(len(classes))
-plt.xticks(tick_marks, classes, rotation=45)
+plt.xticks(tick_marks, classes, rotation=45, ha="right")
 plt.yticks(tick_marks, classes)
-
-# Add accuracy text to top left corner
-plt.text(
-    -0.2,  # x position (slightly to the left of the plot area)
-    -0.2,  # y position (slightly above the plot area)
-    f"Accuracy: {accuracy:.4f}",
-    transform=plt.gca().transAxes,  # Use axis coordinates
-    fontsize=12,
-    fontweight="bold",
-    bbox=dict(
-        facecolor="white", alpha=0.7, edgecolor="black", boxstyle="round,pad=0.5"
-    ),
-)
 
 thresh = cm.max() / 2.0
 for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
@@ -371,14 +359,21 @@ for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
 plt.ylabel("True label")
 plt.xlabel("Predicted label")
 plt.grid(False)
-plt.legend()
-plt.savefig("../../reports/figures/results/NeuralNetwork+FeatureSet4.png")
+# Remove the empty legend since it doesn't seem necessary for this plot
+# plt.legend()
+
+# Adjust layout to make sure everything fits
+plt.tight_layout()
+plt.savefig(
+    "../../reports/figures/results/NeuralNetwork+FeatureSet4.png", bbox_inches="tight"
+)
 plt.show()
 # --------------------------------------------------------------
 # Try a simpler model with the selected features
 # --------------------------------------------------------------
 
-# Decision tree with Selected Features
+model = "Random Forest"
+feature_set = "Feature Set 4"
 (
     class_train_y,
     class_test_y,
@@ -400,10 +395,11 @@ cm = confusion_matrix(Y_test, class_test_y, labels=classes)
 # create confusion matrix for cm
 plt.figure(figsize=(10, 10))
 plt.imshow(cm, interpolation="nearest", cmap=plt.cm.Blues)
-plt.title("Confusion matrix")
+plt.suptitle(f"Accuracy: {accuracy:.5f}", fontsize=12, fontweight="bold", y=0.94)
+plt.title(f"Confusion matrix: {model} + {feature_set}", pad=20)
 plt.colorbar()
 tick_marks = np.arange(len(classes))
-plt.xticks(tick_marks, classes, rotation=45)
+plt.xticks(tick_marks, classes, rotation=45, ha="right")
 plt.yticks(tick_marks, classes)
 
 thresh = cm.max() / 2.0
@@ -418,4 +414,12 @@ for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
 plt.ylabel("True label")
 plt.xlabel("Predicted label")
 plt.grid(False)
+# Remove the empty legend since it doesn't seem necessary for this plot
+# plt.legend()
+
+# Adjust layout to make sure everything fits
+plt.tight_layout()
+plt.savefig(
+    f"../../reports/figures/results/{model}+{feature_set}.png", bbox_inches="tight"
+)
 plt.show()
